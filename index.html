@@ -60,15 +60,21 @@
   <script>
     const correctCode = "2348";
 
+    let certWindow = null; // To hold popup reference
+
     function checkCode() {
       const name = document.getElementById("nameInput").value.trim();
       const code = document.getElementById("codeInput").value.trim();
       const message = document.getElementById("message");
 
-      // Debug logs to check inputs
-      console.log("Name:", `'${name}'`);
-      console.log("Code:", `'${code}'`);
-      console.log("Correct code:", `'${correctCode}'`);
+      // Open popup immediately on user action to avoid blockers
+      if (!certWindow || certWindow.closed) {
+        certWindow = window.open("", "_blank", "width=600,height=400");
+      }
+      if (!certWindow) {
+        alert("Please allow pop-ups for this site to receive your certificate.");
+        return;
+      }
 
       if (name === "") {
         message.style.color = "red";
@@ -86,7 +92,7 @@
         message.style.color = "green";
         message.textContent = `🎉 Well done, ${name}! You unlocked the treasure! 🎉`;
         launchConfetti();
-        setTimeout(() => generateCertificate(name), 2000);
+        setTimeout(() => generateCertificate(name, certWindow), 2000);
       } else {
         message.style.color = "red";
         message.textContent = "❌ Incorrect code. Try again!";
@@ -105,8 +111,7 @@
       }
     }
 
-    function generateCertificate(name) {
-      const win = window.open("", "_blank");
+    function generateCertificate(name, win) {
       const now = new Date();
       const day = String(now.getDate()).padStart(2, "0");
       const month = String(now.getMonth() + 1).padStart(2, "0");
@@ -130,11 +135,6 @@
               width: 80%;
               margin: auto;
             }
-            img.logo {
-              max-width: 120px;
-              margin: 10px auto 30px;
-              display: block;
-            }
             h1 { font-size: 42px; color: #4b0082; }
             h2 { font-size: 24px; color: #333; margin: 10px 0; }
             p { font-size: 18px; margin-top: 30px; }
@@ -142,7 +142,6 @@
         </head>
         <body>
           <div class="box">
-            <img class="logo" src="5a052f63-fdac-49ec-a758-7602c49c7741.png" alt="Columba Catholic Primary School Logo" />
             <h1>🎖 Codebreaker Certificate 🎖</h1>
             <h2>This certifies that</h2>
             <h1>${name}</h1>
